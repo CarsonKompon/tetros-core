@@ -1,0 +1,73 @@
+@using System;
+@using System.Collections.Generic;
+@using System.Linq;
+@using Sandbox;
+@using Sandbox.UI;
+
+@namespace Tetros
+
+<root class="block-panel">
+    <div @ref="Block1" class="@GetClass()"></div>
+    <div @ref="Block2" class="@GetClass()"></div>
+    <div @ref="Block3" class="@GetClass()"></div>
+    <div @ref="Block4" class="@GetClass()"></div>
+</root>
+
+@code
+{
+    public Panel Block1 { get; set; }
+    public Panel Block2 { get; set; }
+    public Panel Block3 { get; set; }
+    public Panel Block4 { get; set; }
+
+    public bool Small { get; set; } = false;
+    public BlockType Block
+    {
+        get
+        {
+            return _Block;
+        }
+        set
+        {
+            _Block = value;
+        }
+    }
+    private BlockType _Block;
+
+    protected override void OnAfterTreeRender(bool firstTime)
+    {
+        base.OnAfterTreeRender(firstTime);
+        SetPositionFromPiece();
+    }
+
+    public string GetClass()
+    {
+        return "block t-" + ((int)Block).ToString() + (Small ? " small" : "");
+    }
+
+    public void SetPositionFromPiece()
+    {
+        @* List<Panel> panel = new() { Block1, Block2, Block3, Block4 };
+        TetrosShape shape = TetrosShapes.GetShape(Block, 0);
+        Log.Info(shape);
+        int index = 0;
+        for(int i=0; i<16; i++)
+        {
+            int x = i % 4;
+            int y = i / 4;
+            int x2 = x - 1;
+            int y2 = y - 1;
+            if(shape.Blocks.Contains(i))
+            {
+                panel[index].Style.Left = x2 * 10f;
+                panel[index].Style.Top = y2 * 10f;
+                index++;
+            }
+        } *@
+    }
+
+    protected override int BuildHash()
+	{
+        return HashCode.Combine(_Block);
+	}
+}

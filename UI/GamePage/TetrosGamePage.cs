@@ -10,16 +10,9 @@ namespace Tetros;
 
 public partial class TetrosGamePage : Panel
 {
-    public Label ScoreLabel;
-    public Label HighScoreLabel;
-    public Label LevelLabel;
-
     public Panel BoardPanel {get; set;}
-    public Panel HoldingBlockPanel {get; set;}
     public Panel[] Blocks {get; set;} = new Panel[200];
     public Panel[] CurrentBlocks {get; set;} = new Panel[4];
-    public Panel[][] NextBlocks {get; set;} = new Panel[5][];
-    public Panel[] HoldBlocks {get; set;} = new Panel[4];
     public Panel[] GhostBlocks {get; set;} = new Panel[4];
 
     // Game Variables
@@ -45,106 +38,66 @@ public partial class TetrosGamePage : Panel
     private RealTimeSince LeftTimer = 0f;
     private RealTimeSince RightTimer = 0f;
 
+    private TetrosMenu Menu;
+
     private Entity SoundEntity => null; 
-    
 
-    public TetrosGamePage()
+    protected override void OnAfterTreeRender(bool firstTime)
     {
-        Board = new List<BlockType>();
-        for(int i=0; i<200; i++)
+        base.OnAfterTreeRender(firstTime);
+
+        if(firstTime)
         {
-            Board.Add(BlockType.Empty);
-        }
+            Board = new List<BlockType>();
+            for(int i=0; i<200; i++)
+            {
+                Board.Add(BlockType.Empty);
+            }
 
-        // AddClass("game-tetros");
-        
-        // var scorePanel = Add.Panel("score-panel");
-        // scorePanel.Add.Label("Score:", "header");
-        // ScoreLabel = scorePanel.Add.Label("0", "score");
+            for(int i=0; i<200; i++)
+            {
+                var block = BoardPanel.Add.Panel("block");
+                Blocks[i] = block;
+            }
 
-        // var levelPanel = Add.Panel("level-panel");
-        // levelPanel.Add.Label("Level:", "header");
-        // LevelLabel = levelPanel.Add.Label("0", "level");
+            for(int i=0; i<4; i++)
+            {
+                CurrentBlocks[i] = BoardPanel.Add.Panel("block current");
+            }
 
-        // var highScorePanel = Add.Panel("high-score-panel");
-        // highScorePanel.Add.Label("High Score:", "header");
-        // HighScoreLabel = highScorePanel.Add.Label("0", "score");
+            for(int i=0; i<4; i++)
+            {
+                GhostBlocks[i] = BoardPanel.Add.Panel("block ghost");
+            }
 
-        // // LEFT PANEL
-        // var leftPanel = Add.Panel("left-panel");
-        // leftPanel.Add.Label("Holding:", "header");
-        // var holding = leftPanel.Add.Panel("holding");
-        // var holdingBlockPanel = holding.Add.Panel("block-panel");
-        // for(int i=0; i<4; i++)
-        // {
-        //     HoldBlocks[i] = holdingBlockPanel.Add.Panel("block held current");
-        // }
+            // Connect all the actions
+            if(Ancestors.FirstOrDefault(x => x is TetrosMenu) is TetrosMenu menu)
+            {
+                Menu = menu;
+                Menu.UpdateBoard += UpdateBoard;
+                Menu.UpdatePlayer += UpdatePlayer;
+                Menu.UpdateHeldPiece += UpdateHeldPiece;
+                Menu.UpdateNextPieces += UpdateNextPieces;
+                Menu.UpdateScore += UpdateScore;
+                Menu.StartGame += StartGame;
+                Menu.EndGame += EndGame;
+            }
 
-        // var controlsPanel = leftPanel.AddChild<ArcadeScreenTetrosControls>();
-
-        // // GAME BOARD
-        // BoardPanel = Add.Panel("board");
-
-        // for(int i=0; i<200; i++)
-        // {
-        //     Blocks[i] = BoardPanel.Add.Panel("block");
-        // }
-
-        // for(int i=0; i<4; i++)
-        // {
-        //     CurrentBlocks[i] = BoardPanel.Add.Panel("block current");
-        // }
-
-        // for(int i=0; i<4; i++)
-        // {
-        //     GhostBlocks[i] = BoardPanel.Add.Panel("block ghost");
-        // }
-
-        // for(int i=0; i<5; i++)
-        // {
-        //     NextBlocks[i] = new Panel[4];
-        // }
-
-        // // RIGHT PANEL
-        // var rightPanel = Add.Panel("right-panel");
-        // rightPanel.Add.Label("Next:", "header");
-        // var next = rightPanel.Add.Panel("next");
-        // var nextBlockPanel = next.Add.Panel("block-panel");
-        // for(int i=0; i<4; i++)
-        // {
-        //     NextBlocks[0][i] = nextBlockPanel.Add.Panel("block");
-        // }
-
-        // for(int i=1; i<5; i++)
-        // {
-        //     var nextRow = rightPanel.Add.Panel("next small");
-        //     var nextSmallBlockPanel = nextRow.Add.Panel("block-panel small");
-        //     for(int j=0; j<4; j++)
-        //     {
-        //         NextBlocks[i][j] = nextSmallBlockPanel.Add.Panel("block current");
-        //     }
-        // }
-
-        // HideAll();
-
-        // Connect all the actions
-        if(Ancestors.FirstOrDefault(x => x is TetrosMenu) is TetrosMenu menu)
-        {
-            menu.UpdateBoard += UpdateBoard;
-            menu.UpdatePlayer += UpdatePlayer;
-            menu.UpdateHeldPiece += UpdateHeldPiece;
-            menu.UpdateNextPieces += UpdateNextPieces;
-            menu.UpdateScore += UpdateScore;
-            menu.ForceEndGame += EndGame;
+            StartGame();
         }
     }
 
 
     public void StartGame()
     {
+        Log.Info("STARTING TETROS GAME!!!");
+
+        Queue.Clear();
         for(int i=0; i<QUEUE_LENGTH; i++)
         {
-            Queue.Add(GetRandomBlock());
+            var block = GetRandomBlock();
+            Queue.Add(block);
+            Log.Info($"Queue[{i}] = {Queue[i]}");
         }
 
         Score = 0;
@@ -152,31 +105,27 @@ public partial class TetrosGamePage : Panel
         Level = 1;
         LinesNeeded = 10;
         Playing = true;
-
-        ShowAll();
     }
 
-    public void EndGame(long steamId)
+    public void EndGame()
     {
-        // TODO: Payout action/event or something
-        // ArcadeMachineTetros.Payout(steamId, Score);
         SaveHighScore();
+        
+        Menu?.OnExit(Score);
 
         CurrentPiece = BlockType.Empty;
-        Board = new List<BlockType>();
+        Board.Clear();
         for(int i=0; i<200; i++)
         {
             Board.Add(BlockType.Empty);
         }
-        GrabBag = new List<BlockType>();
-        Queue = new List<BlockType>();
+        GrabBag.Clear();
+        Queue.Clear();
         HeldPiece = BlockType.Empty;
         Score = 0;
         Playing = false;
 
-        RequestUpdateBoard();
-
-        HideAll();
+        Menu?.Navigate("/");
     }
 
     public void LoadHighScore()
@@ -291,8 +240,8 @@ public partial class TetrosGamePage : Panel
             {
                 board[i] = (int)Board[i];
             }
-            // TODO: Action to update board
-            //ArcadeMachineTetros.RequestUpdateBoard(Machine.NetworkIdent, BoardToString(board));
+            Menu?.ServerUpdateBoard.Invoke(BoardToString(board));
+            
             UpdateBoard(board);
         }
 
@@ -304,8 +253,6 @@ public partial class TetrosGamePage : Panel
                 Blocks[i].SetClass("t-1 t-2 t-3 t-4 t-5 t-6 t-7", false);
                 Blocks[i].SetClass("active t-" + val.ToString(), val != 0);
             }
-            ScoreLabel.Text = Score.ToString();
-            LevelLabel.Text = Level.ToString();
         }
 
         private void RequestUpdateScore()
@@ -319,13 +266,12 @@ public partial class TetrosGamePage : Panel
         {
             if(Style.Opacity == 0f) return;
             
-            ScoreLabel.Text = score.ToString();
+            Score = score;
         }
 
         private void RequestUpdatePlayer()
         {
-            // TODO: Action to request update player
-            //ArcadeMachineTetros.RequestUpdatePlayer(Machine.NetworkIdent, (int)CurrentPiece, CurrentPieceX, CurrentPieceY, CurrentPieceRotation);
+            Menu?.ServerUpdatePlayer.Invoke(CurrentPiece, (int)CurrentPieceX, (int)CurrentPieceY, CurrentPieceRotation);
             UpdatePlayer(CurrentPiece, new Vector2(CurrentPieceX, CurrentPieceY), CurrentPieceRotation);
         }
 
@@ -363,8 +309,7 @@ public partial class TetrosGamePage : Panel
 
         private void RequestHeldPiece()
         {
-            // TODO: Action to request held piece
-            //ArcadeMachineTetros.RequestHeldPiece(Machine.NetworkIdent, (int)HeldPiece);
+            Menu?.ServerRequestHeldPiece(HeldPiece);
             UpdateHeldPiece(HeldPiece);
         }
 
@@ -372,22 +317,7 @@ public partial class TetrosGamePage : Panel
         {
             if(Style.Opacity == 0f) return;
 
-            if(blockType == BlockType.Empty)
-            {
-                for(int i=0; i<4; i++)
-                {
-                    HoldBlocks[i].AddClass("hide");
-                }
-                return;
-            }
-
-            for(int i=0; i<4; i++)
-            {
-                HoldBlocks[i].RemoveClass("hide");
-                HoldBlocks[i].SetClass("t-1 t-2 t-3 t-4 t-5 t-6 t-7", false);
-                HoldBlocks[i].SetClass("current t-" + ((int)blockType).ToString(), blockType != BlockType.Empty);
-            }
-            SetPositionFromPiece(HoldBlocks, blockType, new Vector2(0, 0), 0);
+            HeldPiece = blockType;
         }
 
         private void RequestNextPieces()
@@ -397,65 +327,53 @@ public partial class TetrosGamePage : Panel
             {
                 nextPieces[i] = (int)Queue[i];
             }
-            // TODO: Action to request next pieces
-            //ArcadeMachineTetros.RequestNextPieces(Machine.NetworkIdent, BoardToString(nextPieces));
-            UpdateNextPieces(Queue.ToArray());
+            Menu?.ServerRequestNextPieces(BoardToString(nextPieces));
         }
 
         public void UpdateNextPieces(BlockType[] blockTypes)
         {
             if(Style.Opacity == 0f) return;
 
-            for(int i=0; i<blockTypes.Count(); i++)
-            {
-                if(i >= NextBlocks.Count()) break;
-                for(int j=0; j<NextBlocks[i].Count(); j++)
-                {
-                    NextBlocks[i][j].SetClass("t-1 t-2 t-3 t-4 t-5 t-6 t-7", false);
-                    if(i < blockTypes.Count()) NextBlocks[i][j].SetClass("current t-" + ((int)blockTypes[i]).ToString(), blockTypes[i] != BlockType.Empty);
-                }
-                SetPositionFromPiece(NextBlocks[i], blockTypes[i], new Vector2(0, 0), 0);
-            }
+            Queue = blockTypes.ToList();
         }
 
         public void UpdateHighScore(long score)
         {
             if(Style.Opacity == 0f) return;
-
-            HighScoreLabel.Text = score.ToString();
+            HighScore = score;
         }
 
-        public void ShowAll()
-        {
-            var panelList = new List<Panel>();
-            panelList.AddRange(CurrentBlocks);
-            panelList.AddRange(GhostBlocks);
-            for(int i=0; i<5; i++)
-            {
-                panelList.AddRange(NextBlocks[i]);
-            }
-            panelList.AddRange(HoldBlocks);
-            foreach(var block in panelList)
-            {
-                block.RemoveClass("hide");
-            }
-        }
+        // public void ShowAll()
+        // {
+        //     var panelList = new List<Panel>();
+        //     panelList.AddRange(CurrentBlocks);
+        //     panelList.AddRange(GhostBlocks);
+        //     for(int i=0; i<5; i++)
+        //     {
+        //         panelList.AddRange(NextBlocks[i]);
+        //     }
+        //     panelList.AddRange(HoldBlocks);
+        //     foreach(var block in panelList)
+        //     {
+        //         block.RemoveClass("hide");
+        //     }
+        // }
 
-        public void HideAll()
-        {
-            var panelList = new List<Panel>();
-            panelList.AddRange(CurrentBlocks);
-            panelList.AddRange(GhostBlocks);
-            for(int i=0; i<5; i++)
-            {
-                panelList.AddRange(NextBlocks[i]);
-            }
-            panelList.AddRange(HoldBlocks);
-            foreach(var block in panelList)
-            {
-                block.AddClass("hide");
-            }
-        }
+        // public void HideAll()
+        // {
+        //     var panelList = new List<Panel>();
+        //     panelList.AddRange(CurrentBlocks);
+        //     panelList.AddRange(GhostBlocks);
+        //     for(int i=0; i<5; i++)
+        //     {
+        //         panelList.AddRange(NextBlocks[i]);
+        //     }
+        //     panelList.AddRange(HoldBlocks);
+        //     foreach(var block in panelList)
+        //     {
+        //         block.AddClass("hide");
+        //     }
+        // }
 
     #endregion
 
@@ -490,7 +408,8 @@ public partial class TetrosGamePage : Panel
         {
             var block = Queue[0];
             Queue.RemoveAt(0);
-            Queue.Add(GetRandomBlock());
+            var newBlock = GetRandomBlock();
+            Queue.Add(newBlock);
             return block;
         }
 
@@ -540,8 +459,7 @@ public partial class TetrosGamePage : Panel
                 if(pos < 0)
                 {
                     // TODO: Action for game over
-                    // ArcadeMachineTetros.RequestEndGame(Machine.NetworkIdent);
-                    // Machine.RemoveUser();
+                    EndGame();
                     return;
                 }
                 if(pos < Board.Count)
@@ -804,6 +722,11 @@ public partial class TetrosGamePage : Panel
             return board;
         }
 
-    #endregion
+	#endregion
+
+	protected override int BuildHash()
+	{
+        return HashCode.Combine(Score, Level, HeldPiece, Queue);
+	}
 
 }

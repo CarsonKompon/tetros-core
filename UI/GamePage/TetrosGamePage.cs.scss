@@ -1,10 +1,12 @@
 
 TetrosGamePage
 {
-    background-color: pink;
+    background-color: rgba(black, 0.9);
     justify-content: center;
     align-items: center;
     gap: 10px;
+    position: relative;
+    color: white;
 
     .score-panel, .level-panel, .high-score-panel
     {
@@ -15,7 +17,7 @@ TetrosGamePage
 
     .score-panel
     {
-        bottom: 6px;
+        bottom: 3px;
         left: 6px;
         gap: 2px;
         font-size: 10px;
@@ -23,7 +25,7 @@ TetrosGamePage
 
     .level-panel
     {
-        bottom: 6px;
+        bottom: 3px;
         right: 6px;
         gap: 2px;
         font-size: 10px;
@@ -40,19 +42,22 @@ TetrosGamePage
     {
         width: 64px;
         height: 80%;
-        background-color: #0000004b;
+        background-color: #c5edff11;
         flex-direction: column;
         align-items: center;
         gap: 4px;
         padding-top: 2px;
         padding-bottom: 4px;
+        color: white;
+        font-family: Verdana;
+        font-weight: 700;
 
         .header
         {
             width: 100%;
             text-align: center;
-            font-family: Poppins;
             font-size: 10px;
+            padding: 2px;
         }
     }
 
@@ -60,7 +65,7 @@ TetrosGamePage
     {
         width: 100px;
         height: 200px;
-        background-color: mediumaquamarine;
+        background-color: rgb(39, 54, 75);
         flex-wrap: wrap;
     }
 
@@ -163,9 +168,10 @@ TetrosGamePage
 
     .block-panel
     {
-        width: auto;
-        height: auto;
-        background-color: red;
+        position: relative;
+        width: 32px;
+        height: 32px;
+        background-color: rgba(red, 0.25);
         
         &.small
         {

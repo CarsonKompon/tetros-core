@@ -11,12 +11,20 @@
 
 @code
 {
-    public Action<int[]> UpdateBoard;
-    public Action<BlockType, Vector2, int> UpdatePlayer;
-    public Action<BlockType> UpdateHeldPiece;
-    public Action<BlockType[]> UpdateNextPieces;
-    public Action<long> UpdateScore;
-    public Action<long> ForceEndGame;
+    public Action<int[]> UpdateBoard = delegate { };
+    public Action<BlockType, Vector2, int> UpdatePlayer = delegate { };
+    public Action<BlockType> UpdateHeldPiece = delegate { };
+    public Action<BlockType[]> UpdateNextPieces = delegate { };
+    public Action<long> UpdateScore = delegate { };
+    public Action StartGame = delegate { };
+    public Action EndGame = delegate { };
+
+    public Action<string> ServerUpdateBoard = delegate { };
+    public Action<BlockType, int, int, int> ServerUpdatePlayer = delegate { };
+    public Action<BlockType> ServerRequestHeldPiece = delegate { };
+    public Action<string> ServerRequestNextPieces = delegate { };
+
+    public Action<long> OnExit = delegate { };
 
     public TetrosMenu()
     {

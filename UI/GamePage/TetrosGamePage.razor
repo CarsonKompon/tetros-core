@@ -18,25 +18,32 @@
     <div class="left-panel">
         <label class="header">Holding:</label>
         <div class="holding">
-            <div @ref="HoldingBlockPanel" class="block-panel"></div>
+            @if(HeldPiece != BlockType.Empty)
+            {
+                <TetrosPanel Block=@(HeldPiece) />
+            }
         </div>
     </div>
 
     <!-- Game Panel -->
-    <div class="board">
+    <div @ref="BoardPanel" class="board">
     </div>
 
     <!-- Right Panel -->
     <div class="right-panel">
         <label class="header">Next:</label>
-        <div class="next">
-            <div class="block-panel"></div>
-        </div>
-        @for(int i=0; i<4; i++)
+        @if(Queue.Count > 0)
         {
-            <div class="next small">
-                <div class="block-panel small"></div>
+            <div class="next">
+                <TetrosPanel Block=@(Queue[0]) />
             </div>
+            
+            @for(int i=1; i<Queue.Count; i++)
+            {
+                <div class="next small">
+                    <TetrosPanel Block=@(Queue[i]) Small=@true />
+                </div>
+            }
         }
     </div>
 </root>
