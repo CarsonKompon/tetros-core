@@ -105,13 +105,17 @@ public partial class TetrosGamePage : Panel
         Level = 1;
         LinesNeeded = 10;
         Playing = true;
+
+        RequestUpdateBoard();
     }
 
-    public void EndGame()
+    public void EndGame(long steamid = 0)
     {
-        SaveHighScore();
-        
-        Menu?.OnExit(Score);
+        if(steamid == 0 || steamid == Game.LocalClient.SteamId)
+        {        
+            SaveHighScore();
+            Menu?.OnExit.Invoke(Score);
+        }
 
         CurrentPiece = BlockType.Empty;
         Board.Clear();

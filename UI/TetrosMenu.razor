@@ -17,7 +17,7 @@
     public Action<BlockType[]> UpdateNextPieces = delegate { };
     public Action<long> UpdateScore = delegate { };
     public Action StartGame = delegate { };
-    public Action EndGame = delegate { };
+    public Action<long> EndGame = delegate { };
 
     public Action<string> ServerUpdateBoard = delegate { };
     public Action<BlockType, int, int, int> ServerUpdatePlayer = delegate { };
