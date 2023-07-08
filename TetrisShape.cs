@@ -3,9 +3,11 @@ using System.Linq;
 using Sandbox;
 using Sandbox.UI;
 
-namespace Home;
+namespace Tetros;
 
-public class TetrisShape
+
+public enum BlockType { Empty, I, O, T, S, Z, J, L };
+public class TetrosShape
 {
     public int[] Blocks {get; set;}
 
@@ -29,75 +31,75 @@ public class TetrisShape
     }
 }
 
-public static class TetrisShapes
+public static class TetrosShapes
 {
-    public static readonly TetrisShape[] I = new TetrisShape[4] {
-        new TetrisShape {Blocks = new int[4] {4,5,6,7}},
-        new TetrisShape {Blocks = new int[4] {2,6,10,14}},
-        new TetrisShape {Blocks = new int[4] {8,9,10,11}},
-        new TetrisShape {Blocks = new int[4] {1,5,9,13}}
+    public static readonly TetrosShape[] I = new TetrosShape[4] {
+        new TetrosShape {Blocks = new int[4] {4,5,6,7}},
+        new TetrosShape {Blocks = new int[4] {2,6,10,14}},
+        new TetrosShape {Blocks = new int[4] {8,9,10,11}},
+        new TetrosShape {Blocks = new int[4] {1,5,9,13}}
     };
 
-    public static readonly TetrisShape[] O = new TetrisShape[4] {
-        new TetrisShape {Blocks = new int[4] {5,6,9,10}},
-        new TetrisShape {Blocks = new int[4] {5,6,9,10}},
-        new TetrisShape {Blocks = new int[4] {5,6,9,10}},
-        new TetrisShape {Blocks = new int[4] {5,6,9,10}}
+    public static readonly TetrosShape[] O = new TetrosShape[4] {
+        new TetrosShape {Blocks = new int[4] {5,6,9,10}},
+        new TetrosShape {Blocks = new int[4] {5,6,9,10}},
+        new TetrosShape {Blocks = new int[4] {5,6,9,10}},
+        new TetrosShape {Blocks = new int[4] {5,6,9,10}}
     };
 
-    public static readonly TetrisShape[] T = new TetrisShape[4] {
-        new TetrisShape {Blocks = new int[4] {1,4,5,6}},
-        new TetrisShape {Blocks = new int[4] {1,5,6,9}},
-        new TetrisShape {Blocks = new int[4] {4,5,6,9}},
-        new TetrisShape {Blocks = new int[4] {1,4,5,9}}
+    public static readonly TetrosShape[] T = new TetrosShape[4] {
+        new TetrosShape {Blocks = new int[4] {1,4,5,6}},
+        new TetrosShape {Blocks = new int[4] {1,5,6,9}},
+        new TetrosShape {Blocks = new int[4] {4,5,6,9}},
+        new TetrosShape {Blocks = new int[4] {1,4,5,9}}
     };
 
-    public static readonly TetrisShape[] S = new TetrisShape[4] {
-        new TetrisShape {Blocks = new int[4] {1,2,4,5}},
-        new TetrisShape {Blocks = new int[4] {0,4,5,9}},
-        new TetrisShape {Blocks = new int[4] {1,2,4,5}},
-        new TetrisShape {Blocks = new int[4] {0,4,5,9}}
+    public static readonly TetrosShape[] S = new TetrosShape[4] {
+        new TetrosShape {Blocks = new int[4] {1,2,4,5}},
+        new TetrosShape {Blocks = new int[4] {0,4,5,9}},
+        new TetrosShape {Blocks = new int[4] {1,2,4,5}},
+        new TetrosShape {Blocks = new int[4] {0,4,5,9}}
     };
 
-    public static readonly TetrisShape[] Z = new TetrisShape[4] {
-        new TetrisShape {Blocks = new int[4] {0,1,5,6}},
-        new TetrisShape {Blocks = new int[4] {1,5,4,8}},
-        new TetrisShape {Blocks = new int[4] {0,1,5,6}},
-        new TetrisShape {Blocks = new int[4] {1,5,4,8}}
+    public static readonly TetrosShape[] Z = new TetrosShape[4] {
+        new TetrosShape {Blocks = new int[4] {0,1,5,6}},
+        new TetrosShape {Blocks = new int[4] {1,5,4,8}},
+        new TetrosShape {Blocks = new int[4] {0,1,5,6}},
+        new TetrosShape {Blocks = new int[4] {1,5,4,8}}
     };
 
-    public static readonly TetrisShape[] J = new TetrisShape[4] {
-        new TetrisShape {Blocks = new int[4] {0,4,5,6}},
-        new TetrisShape {Blocks = new int[4] {1,2,5,9}},
-        new TetrisShape {Blocks = new int[4] {4,5,6,10}},
-        new TetrisShape {Blocks = new int[4] {1,5,9,8}}
+    public static readonly TetrosShape[] J = new TetrosShape[4] {
+        new TetrosShape {Blocks = new int[4] {0,4,5,6}},
+        new TetrosShape {Blocks = new int[4] {1,2,5,9}},
+        new TetrosShape {Blocks = new int[4] {4,5,6,10}},
+        new TetrosShape {Blocks = new int[4] {1,5,9,8}}
     };
 
-    public static readonly TetrisShape[] L = new TetrisShape[4] {
-        new TetrisShape {Blocks = new int[4] {2,4,5,6}},
-        new TetrisShape {Blocks = new int[4] {1,5,9,10}},
-        new TetrisShape {Blocks = new int[4] {4,5,6,8}},
-        new TetrisShape {Blocks = new int[4] {0,1,5,9}}
+    public static readonly TetrosShape[] L = new TetrosShape[4] {
+        new TetrosShape {Blocks = new int[4] {2,4,5,6}},
+        new TetrosShape {Blocks = new int[4] {1,5,9,10}},
+        new TetrosShape {Blocks = new int[4] {4,5,6,8}},
+        new TetrosShape {Blocks = new int[4] {0,1,5,9}}
     };
 
-    public static TetrisShape GetShape(ArcadeScreenTetris.BlockType blockType, int rotation)
+    public static TetrosShape GetShape(BlockType blockType, int rotation)
     {
         if(rotation < 0) rotation += 4;
         switch(blockType)
         {
-            case ArcadeScreenTetris.BlockType.I:
+            case BlockType.I:
                 return I[rotation];
-            case ArcadeScreenTetris.BlockType.O:
+            case BlockType.O:
                 return O[rotation];
-            case ArcadeScreenTetris.BlockType.T:
+            case BlockType.T:
                 return T[rotation];
-            case ArcadeScreenTetris.BlockType.S:
+            case BlockType.S:
                 return S[rotation];
-            case ArcadeScreenTetris.BlockType.Z:
+            case BlockType.Z:
                 return Z[rotation];
-            case ArcadeScreenTetris.BlockType.J:
+            case BlockType.J:
                 return J[rotation];
-            case ArcadeScreenTetris.BlockType.L:
+            case BlockType.L:
                 return L[rotation];
             default:
                 return I[rotation];

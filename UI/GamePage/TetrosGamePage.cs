@@ -5,15 +5,17 @@ using Sandbox;
 using Sandbox.UI;
 using Sandbox.UI.Construct;
 
-namespace Home;
+namespace Tetros;
 
-public partial class ArcadeScreenTetris : WorldPanel
+
+public partial class TetrosGamePage : Panel
 {
     public Label ScoreLabel;
     public Label HighScoreLabel;
     public Label LevelLabel;
 
     public Panel BoardPanel {get; set;}
+    public Panel HoldingBlockPanel {get; set;}
     public Panel[] Blocks {get; set;} = new Panel[200];
     public Panel[] CurrentBlocks {get; set;} = new Panel[4];
     public Panel[][] NextBlocks {get; set;} = new Panel[5][];
@@ -21,7 +23,6 @@ public partial class ArcadeScreenTetris : WorldPanel
     public Panel[] GhostBlocks {get; set;} = new Panel[4];
 
     // Game Variables
-    public enum BlockType { Empty, I, O, T, S, Z, J, L };
     const int BOARD_WIDTH = 10;
     const int QUEUE_LENGTH = 5;
     public BlockType HeldPiece {get; set;} = BlockType.Empty;
@@ -43,10 +44,11 @@ public partial class ArcadeScreenTetris : WorldPanel
     private RealTimeSince LastUpdate = 0f;
     private RealTimeSince LeftTimer = 0f;
     private RealTimeSince RightTimer = 0f;
-    
-    public ArcadeMachineTetris Machine;
 
-    public ArcadeScreenTetris()
+    private Entity SoundEntity => null; 
+    
+
+    public TetrosGamePage()
     {
         Board = new List<BlockType>();
         for(int i=0; i<200; i++)
@@ -54,88 +56,89 @@ public partial class ArcadeScreenTetris : WorldPanel
             Board.Add(BlockType.Empty);
         }
 
-        StyleSheet.Load("/Entities/Arcade/Tetris/ArcadeScreenTetris.scss");
-
-        AddClass("game-tetris");
+        // AddClass("game-tetros");
         
-        var scorePanel = Add.Panel("score-panel");
-        scorePanel.Add.Label("Score:", "header");
-        ScoreLabel = scorePanel.Add.Label("0", "score");
+        // var scorePanel = Add.Panel("score-panel");
+        // scorePanel.Add.Label("Score:", "header");
+        // ScoreLabel = scorePanel.Add.Label("0", "score");
 
-        var levelPanel = Add.Panel("level-panel");
-        levelPanel.Add.Label("Level:", "header");
-        LevelLabel = levelPanel.Add.Label("0", "level");
+        // var levelPanel = Add.Panel("level-panel");
+        // levelPanel.Add.Label("Level:", "header");
+        // LevelLabel = levelPanel.Add.Label("0", "level");
 
-        var highScorePanel = Add.Panel("high-score-panel");
-        highScorePanel.Add.Label("High Score:", "header");
-        HighScoreLabel = highScorePanel.Add.Label("0", "score");
+        // var highScorePanel = Add.Panel("high-score-panel");
+        // highScorePanel.Add.Label("High Score:", "header");
+        // HighScoreLabel = highScorePanel.Add.Label("0", "score");
 
-        // LEFT PANEL
-        var leftPanel = Add.Panel("left-panel");
-        leftPanel.Add.Label("Holding:", "header");
-        var holding = leftPanel.Add.Panel("holding");
-        var holdingBlockPanel = holding.Add.Panel("block-panel");
-        for(int i=0; i<4; i++)
+        // // LEFT PANEL
+        // var leftPanel = Add.Panel("left-panel");
+        // leftPanel.Add.Label("Holding:", "header");
+        // var holding = leftPanel.Add.Panel("holding");
+        // var holdingBlockPanel = holding.Add.Panel("block-panel");
+        // for(int i=0; i<4; i++)
+        // {
+        //     HoldBlocks[i] = holdingBlockPanel.Add.Panel("block held current");
+        // }
+
+        // var controlsPanel = leftPanel.AddChild<ArcadeScreenTetrosControls>();
+
+        // // GAME BOARD
+        // BoardPanel = Add.Panel("board");
+
+        // for(int i=0; i<200; i++)
+        // {
+        //     Blocks[i] = BoardPanel.Add.Panel("block");
+        // }
+
+        // for(int i=0; i<4; i++)
+        // {
+        //     CurrentBlocks[i] = BoardPanel.Add.Panel("block current");
+        // }
+
+        // for(int i=0; i<4; i++)
+        // {
+        //     GhostBlocks[i] = BoardPanel.Add.Panel("block ghost");
+        // }
+
+        // for(int i=0; i<5; i++)
+        // {
+        //     NextBlocks[i] = new Panel[4];
+        // }
+
+        // // RIGHT PANEL
+        // var rightPanel = Add.Panel("right-panel");
+        // rightPanel.Add.Label("Next:", "header");
+        // var next = rightPanel.Add.Panel("next");
+        // var nextBlockPanel = next.Add.Panel("block-panel");
+        // for(int i=0; i<4; i++)
+        // {
+        //     NextBlocks[0][i] = nextBlockPanel.Add.Panel("block");
+        // }
+
+        // for(int i=1; i<5; i++)
+        // {
+        //     var nextRow = rightPanel.Add.Panel("next small");
+        //     var nextSmallBlockPanel = nextRow.Add.Panel("block-panel small");
+        //     for(int j=0; j<4; j++)
+        //     {
+        //         NextBlocks[i][j] = nextSmallBlockPanel.Add.Panel("block current");
+        //     }
+        // }
+
+        // HideAll();
+
+        // Connect all the actions
+        if(Ancestors.FirstOrDefault(x => x is TetrosMenu) is TetrosMenu menu)
         {
-            HoldBlocks[i] = holdingBlockPanel.Add.Panel("block held current");
+            menu.UpdateBoard += UpdateBoard;
+            menu.UpdatePlayer += UpdatePlayer;
+            menu.UpdateHeldPiece += UpdateHeldPiece;
+            menu.UpdateNextPieces += UpdateNextPieces;
+            menu.UpdateScore += UpdateScore;
+            menu.ForceEndGame += EndGame;
         }
-
-        var controlsPanel = leftPanel.AddChild<ArcadeScreenTetrisControls>();
-
-        // GAME BOARD
-        BoardPanel = Add.Panel("board");
-
-        for(int i=0; i<200; i++)
-        {
-            Blocks[i] = BoardPanel.Add.Panel("block");
-        }
-
-        for(int i=0; i<4; i++)
-        {
-            CurrentBlocks[i] = BoardPanel.Add.Panel("block current");
-        }
-
-        for(int i=0; i<4; i++)
-        {
-            GhostBlocks[i] = BoardPanel.Add.Panel("block ghost");
-        }
-
-        for(int i=0; i<5; i++)
-        {
-            NextBlocks[i] = new Panel[4];
-        }
-
-        // RIGHT PANEL
-        var rightPanel = Add.Panel("right-panel");
-        rightPanel.Add.Label("Next:", "header");
-        var next = rightPanel.Add.Panel("next");
-        var nextBlockPanel = next.Add.Panel("block-panel");
-        for(int i=0; i<4; i++)
-        {
-            NextBlocks[0][i] = nextBlockPanel.Add.Panel("block");
-        }
-
-        for(int i=1; i<5; i++)
-        {
-            var nextRow = rightPanel.Add.Panel("next small");
-            var nextSmallBlockPanel = nextRow.Add.Panel("block-panel small");
-            for(int j=0; j<4; j++)
-            {
-                NextBlocks[i][j] = nextSmallBlockPanel.Add.Panel("block current");
-            }
-        }
-
-        HideAll();
-
-        float width = 600f;
-        float height = 500f;
-        PanelBounds = new Rect(-width/2, -height/2, width, height);
     }
 
-    public ArcadeScreenTetris(ArcadeMachineTetris machine) : this()
-    {
-        Machine = machine;
-    }
 
     public void StartGame()
     {
@@ -155,7 +158,8 @@ public partial class ArcadeScreenTetris : WorldPanel
 
     public void EndGame(long steamId)
     {
-        ArcadeMachineTetris.Payout(steamId, Score);
+        // TODO: Payout action/event or something
+        // ArcadeMachineTetros.Payout(steamId, Score);
         SaveHighScore();
 
         CurrentPiece = BlockType.Empty;
@@ -189,17 +193,10 @@ public partial class ArcadeScreenTetris : WorldPanel
         }
     }
 
-    [GameEvent.Tick.Client]
-    public void OnTick()
-    {
-        Style.Opacity = MathX.Clamp(1.25f - (Vector3.DistanceBetween( Camera.Position, Position ) * 0.004f), 0f, 1f);
-    }
-
     [GameEvent.Client.Frame]
     public void OnFrame()
     {
         if(!Playing) return;
-        if(Game.LocalClient.SteamId != Machine.CurrentUser.Client.SteamId) return;
 
         var interval = GetWaitTime();
         if(FastDrop) interval = MathF.Min(0.04f, interval / 4f);
@@ -219,7 +216,11 @@ public partial class ArcadeScreenTetris : WorldPanel
                 }
                 else if(FastDrop)
                 {
-                    Sound.FromEntity("tetros_move", Machine).SetPitch(1.5f);
+                    if(SoundEntity == null)
+                        Sound.FromScreen("tetros_move").SetPitch(1.5f);
+                    else
+                        Sound.FromEntity("tetros_move", SoundEntity).SetPitch(1.5f);
+
                     Score += 1;
                 }
                 RequestUpdatePlayer();
@@ -236,7 +237,6 @@ public partial class ArcadeScreenTetris : WorldPanel
     public void BuildInput()
     {
         if(!Playing) return;
-        if(Game.LocalClient.SteamId != Machine.CurrentUser.Client.SteamId) return;
 
         if(Input.Pressed("TetrosHardDrop"))
         {
@@ -291,7 +291,8 @@ public partial class ArcadeScreenTetris : WorldPanel
             {
                 board[i] = (int)Board[i];
             }
-            ArcadeMachineTetris.RequestUpdateBoard(Machine.NetworkIdent, BoardToString(board));
+            // TODO: Action to update board
+            //ArcadeMachineTetros.RequestUpdateBoard(Machine.NetworkIdent, BoardToString(board));
             UpdateBoard(board);
         }
 
@@ -309,7 +310,8 @@ public partial class ArcadeScreenTetris : WorldPanel
 
         private void RequestUpdateScore()
         {
-            ArcadeMachineTetris.RequestScore(Machine.NetworkIdent, Score);
+            //TODO: Action to request update score
+            //ArcadeMachineTetros.RequestScore(Machine.NetworkIdent, Score);
             UpdateScore(Score);
         }
 
@@ -322,7 +324,8 @@ public partial class ArcadeScreenTetris : WorldPanel
 
         private void RequestUpdatePlayer()
         {
-            ArcadeMachineTetris.RequestUpdatePlayer(Machine.NetworkIdent, (int)CurrentPiece, CurrentPieceX, CurrentPieceY, CurrentPieceRotation);
+            // TODO: Action to request update player
+            //ArcadeMachineTetros.RequestUpdatePlayer(Machine.NetworkIdent, (int)CurrentPiece, CurrentPieceX, CurrentPieceY, CurrentPieceRotation);
             UpdatePlayer(CurrentPiece, new Vector2(CurrentPieceX, CurrentPieceY), CurrentPieceRotation);
         }
 
@@ -360,7 +363,8 @@ public partial class ArcadeScreenTetris : WorldPanel
 
         private void RequestHeldPiece()
         {
-            ArcadeMachineTetris.RequestHeldPiece(Machine.NetworkIdent, (int)HeldPiece);
+            // TODO: Action to request held piece
+            //ArcadeMachineTetros.RequestHeldPiece(Machine.NetworkIdent, (int)HeldPiece);
             UpdateHeldPiece(HeldPiece);
         }
 
@@ -393,7 +397,8 @@ public partial class ArcadeScreenTetris : WorldPanel
             {
                 nextPieces[i] = (int)Queue[i];
             }
-            ArcadeMachineTetris.RequestNextPieces(Machine.NetworkIdent, BoardToString(nextPieces));
+            // TODO: Action to request next pieces
+            //ArcadeMachineTetros.RequestNextPieces(Machine.NetworkIdent, BoardToString(nextPieces));
             UpdateNextPieces(Queue.ToArray());
         }
 
@@ -496,7 +501,7 @@ public partial class ArcadeScreenTetris : WorldPanel
 
         public bool CheckPieceCollision(BlockType block, int rot, Vector2 pos)
         {
-            var piece = TetrisShapes.GetShape(block, rot);
+            var piece = TetrosShapes.GetShape(block, rot);
             var grid = piece.GetGrid();
             for(int i=0; i<16; i++)
             {
@@ -523,7 +528,7 @@ public partial class ArcadeScreenTetris : WorldPanel
 
     private void PlacePiece()
     {
-        var piece = TetrisShapes.GetShape(CurrentPiece, CurrentPieceRotation);
+        var piece = TetrosShapes.GetShape(CurrentPiece, CurrentPieceRotation);
         var grid = piece.GetGrid();
         for(int i=0; i<16; i++)
         {
@@ -534,8 +539,9 @@ public partial class ArcadeScreenTetris : WorldPanel
                 int pos = x + (y * BOARD_WIDTH);
                 if(pos < 0)
                 {
-                    ArcadeMachineTetris.RequestEndGame(Machine.NetworkIdent);
-                    Machine.RemoveUser();
+                    // TODO: Action for game over
+                    // ArcadeMachineTetros.RequestEndGame(Machine.NetworkIdent);
+                    // Machine.RemoveUser();
                     return;
                 }
                 if(pos < Board.Count)
@@ -545,7 +551,10 @@ public partial class ArcadeScreenTetris : WorldPanel
             }
         }
         JustHeld = false;
-        Sound.FromEntity("tetros_place", Machine);
+        if(SoundEntity == null)
+            Sound.FromScreen("tetros_place");
+        else
+            Sound.FromEntity("tetros_place", SoundEntity);
         CurrentPiece = BlockType.Empty;
         GetNewBlock();
         
@@ -591,7 +600,13 @@ public partial class ArcadeScreenTetris : WorldPanel
             }
             if(lines > 0)
             {
-                Sound.FromEntity("tetros_line", Machine).SetPitch(1f + (MathF.Max(0, Combo) * (1.0f/12.0f)));
+                Sound sound;
+                if(SoundEntity == null)
+                    sound = Sound.FromScreen("tetros_line");
+                else
+                    sound = Sound.FromEntity("tetros_line", SoundEntity);
+                sound.SetPitch(1f + (MathF.Max(0, Combo) * (1.0f/12.0f)));
+
                 Combo += 1;
                 switch(lines)
                 {
@@ -605,7 +620,10 @@ public partial class ArcadeScreenTetris : WorldPanel
                         Score += 500 * Level;
                         break;
                     case 4:
-                        Sound.FromEntity("tetros_tetros", Machine);
+                        if(SoundEntity == null)
+                            Sound.FromScreen("tetros_tetros");
+                        else
+                            Sound.FromEntity("tetros_tetros", SoundEntity);
                         Score += 800 * Level;
                         break;
                 }
@@ -641,7 +659,10 @@ public partial class ArcadeScreenTetris : WorldPanel
             {
                 CurrentPieceX -= MathF.Sign(dir);
             }
-            Sound.FromEntity("tetros_move", Machine);
+            if(SoundEntity == null)
+                Sound.FromScreen("tetros_move");
+            else
+                Sound.FromEntity("tetros_move", SoundEntity);
             RequestUpdatePlayer();
         }
 
@@ -656,7 +677,10 @@ public partial class ArcadeScreenTetris : WorldPanel
                 CurrentPieceRotation = prevRot;
             }
             LastUpdate /= 2;
-            Sound.FromEntity("tetros_rotate", Machine);
+            if(SoundEntity == null)
+                Sound.FromScreen("tetros_rotate");
+            else
+                Sound.FromEntity("tetros_rotate", SoundEntity);
             RequestUpdatePlayer();
         }
 
@@ -694,7 +718,10 @@ public partial class ArcadeScreenTetris : WorldPanel
             CurrentPieceY = -2;
             CurrentPieceRotation = 0;
             JustHeld = true;
-            Sound.FromEntity("tetros_hold", Machine);
+            if(SoundEntity == null)
+                Sound.FromScreen("tetros_hold");
+            else
+                Sound.FromEntity("tetros_hold", SoundEntity);
 
             RequestHeldPiece();
             RequestUpdatePlayer();
@@ -706,7 +733,7 @@ public partial class ArcadeScreenTetris : WorldPanel
 
         public void SetPositionFromPiece(Panel[] panel, BlockType blockType, Vector2 pos, int rotation)
         {
-            TetrisShape shape = TetrisShapes.GetShape(blockType, rotation);
+            TetrosShape shape = TetrosShapes.GetShape(blockType, rotation);
             int index = 0;
             for(int i=0; i<16; i++)
             {

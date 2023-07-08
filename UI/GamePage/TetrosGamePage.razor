@@ -1,0 +1,42 @@
+@using Sandbox;
+@using Sandbox.UI;
+@attribute [StyleSheet]
+
+@namespace Tetros
+
+<root class="game-tetros">
+    <div class="score-panel">
+        <label class="header">Score:</label>
+        <label class="score" text=@Score ></label>
+    </div>
+    <div class="level-panel">
+        <label class="header">Level:</label>
+        <label class="level" text=@Level ></label>
+    </div>
+
+    <!-- Left Panel -->
+    <div class="left-panel">
+        <label class="header">Holding:</label>
+        <div class="holding">
+            <div @ref="HoldingBlockPanel" class="block-panel"></div>
+        </div>
+    </div>
+
+    <!-- Game Panel -->
+    <div class="board">
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+        <label class="header">Next:</label>
+        <div class="next">
+            <div class="block-panel"></div>
+        </div>
+        @for(int i=0; i<4; i++)
+        {
+            <div class="next small">
+                <div class="block-panel small"></div>
+            </div>
+        }
+    </div>
+</root>

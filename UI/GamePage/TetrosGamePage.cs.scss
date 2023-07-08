@@ -1,5 +1,5 @@
 
-ArcadeScreenTetris
+TetrosGamePage
 {
     background-color: pink;
     justify-content: center;
@@ -76,42 +76,42 @@ ArcadeScreenTetris
 
         &.active, &.current
         {
-            background-image: url("/ui/tetros/block.png");
+            background-image: url("/sprites/arcade/tetros/block.png");
             background-size: contain;
 
             &.t-1
             {
-                background-image: url("/ui/tetros/block-1.png");
+                background-image: url("/sprites/arcade/tetros/block-1.png");
             }
 
             &.t-2
             {
-                background-image: url("/ui/tetros/block-2.png");
+                background-image: url("/sprites/arcade/tetros/block-2.png");
             }
 
             &.t-3
             {
-                background-image: url("/ui/tetros/block-3.png");
+                background-image: url("/sprites/arcade/tetros/block-3.png");
             }
             &.t-4
 
             {
-                background-image: url("/ui/tetros/block-4.png");
+                background-image: url("/sprites/arcade/tetros/block-4.png");
             }
 
             &.t-5
             {
-                background-image: url("/ui/tetros/block-5.png");
+                background-image: url("/sprites/arcade/tetros/block-5.png");
             }
 
             &.t-6
             {
-                background-image: url("/ui/tetros/block-6.png");
+                background-image: url("/sprites/arcade/tetros/block-6.png");
             }
 
             &.t-7
             {
-                background-image: url("/ui/tetros/block-7.png");
+                background-image: url("/sprites/arcade/tetros/block-7.png");
             }
         }
 

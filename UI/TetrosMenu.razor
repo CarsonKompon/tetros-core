@@ -1,0 +1,27 @@
+@using System;
+@using Sandbox.UI;
+@attribute [StyleSheet]
+
+@inherits Sandbox.UI.NavHostPanel
+@namespace Tetros
+
+<root>
+
+</root>
+
+@code
+{
+    public Action<int[]> UpdateBoard;
+    public Action<BlockType, Vector2, int> UpdatePlayer;
+    public Action<BlockType> UpdateHeldPiece;
+    public Action<BlockType[]> UpdateNextPieces;
+    public Action<long> UpdateScore;
+    public Action<long> ForceEndGame;
+
+    public TetrosMenu()
+    {
+        DefaultUrl = "/";
+
+        AddDestination("/", typeof(TetrosGamePage));
+    }
+}
