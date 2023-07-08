@@ -268,9 +268,7 @@ public partial class TetrosGamePage : Panel
         }
 
         public void UpdateScore(long score)
-        {
-            if(Style.Opacity == 0f) return;
-            
+        {            
             Score = score;
         }
 
@@ -282,8 +280,6 @@ public partial class TetrosGamePage : Panel
 
         public void UpdatePlayer(BlockType blockType, Vector2 pos, int rotation)
         {
-            if(Style.Opacity == 0f) return;
-
             if(blockType == BlockType.Empty)
             {
                 for(int i=0; i<4; i++)
@@ -320,8 +316,6 @@ public partial class TetrosGamePage : Panel
 
         public void UpdateHeldPiece(BlockType blockType)
         {
-            if(Style.Opacity == 0f) return;
-
             HeldPiece = blockType;
         }
 
@@ -337,14 +331,11 @@ public partial class TetrosGamePage : Panel
 
         public void UpdateNextPieces(BlockType[] blockTypes)
         {
-            if(Style.Opacity == 0f) return;
-
             Queue = blockTypes.ToList();
         }
 
         public void UpdateHighScore(long score)
         {
-            if(Style.Opacity == 0f) return;
             HighScore = score;
         }
 
@@ -623,7 +614,7 @@ public partial class TetrosGamePage : Panel
 
     #region HELPER FUNCTIONS
 
-        public void SetPositionFromPiece(Panel[] panel, BlockType blockType, Vector2 pos, int rotation)
+        public static void SetPositionFromPiece(Panel[] panel, BlockType blockType, Vector2 pos, int rotation)
         {
             TetrosShape shape = TetrosShapes.GetShape(blockType, rotation);
             int index = 0;

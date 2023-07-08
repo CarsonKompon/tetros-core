@@ -69,79 +69,6 @@ TetrosGamePage
         flex-wrap: wrap;
     }
 
-    .block
-    {
-        width: 10px;
-        height: 10px;
-        
-        &.hide
-        {
-            opacity: 0;
-        }
-
-        &.active, &.current
-        {
-            background-image: url("/sprites/arcade/tetros/block.png");
-            background-size: contain;
-
-            &.t-1
-            {
-                background-image: url("/sprites/arcade/tetros/block-1.png");
-            }
-
-            &.t-2
-            {
-                background-image: url("/sprites/arcade/tetros/block-2.png");
-            }
-
-            &.t-3
-            {
-                background-image: url("/sprites/arcade/tetros/block-3.png");
-            }
-            &.t-4
-
-            {
-                background-image: url("/sprites/arcade/tetros/block-4.png");
-            }
-
-            &.t-5
-            {
-                background-image: url("/sprites/arcade/tetros/block-5.png");
-            }
-
-            &.t-6
-            {
-                background-image: url("/sprites/arcade/tetros/block-6.png");
-            }
-
-            &.t-7
-            {
-                background-image: url("/sprites/arcade/tetros/block-7.png");
-            }
-        }
-
-        &.current
-        {
-            position: absolute;
-            // background: radial-gradient(rgb(255, 255, 255) 0%, #64ffff);
-            // border: solid 1px #64ffff;
-        }
-
-        &.ghost
-        {
-            position: absolute;
-            background: radial-gradient(rgb(255, 255, 255) 0%, #868686 100%);
-            border: solid 1px #868686;
-            opacity: 0.5;
-
-            &.hide
-            {
-                opacity: 0;
-            }
-        }
-
-    }
-
     .holding
     {
         aspect-ratio: 1;
@@ -168,10 +95,9 @@ TetrosGamePage
 
     .block-panel
     {
-        position: relative;
         width: 32px;
         height: 32px;
-        background-color: rgba(red, 0.25);
+        //background-color: rgba(red, 0.25);
         
         &.small
         {
@@ -179,14 +105,14 @@ TetrosGamePage
 
             .block
             {
-                transform: translate(-5px, 0);
+                transform: translate(2.5px, 5px);
             }
         }
 
         .block
         {
             position: absolute;
-            transform: translate(-10px, 0);
+            transform: translate(12px, 12px);
         }
     }
 
@@ -228,4 +154,77 @@ TetrosGamePage
             }
         }
     }
+}
+
+.block
+{
+    width: 10px;
+    height: 10px;
+    
+    &.hide
+    {
+        opacity: 0;
+    }
+
+    &.active, &.current
+    {
+        background-image: url("/sprites/arcade/tetros/block.png");
+        background-size: contain;
+
+        &.t-1
+        {
+            background-image: url("/sprites/arcade/tetros/block-1.png");
+        }
+
+        &.t-2
+        {
+            background-image: url("/sprites/arcade/tetros/block-2.png");
+        }
+
+        &.t-3
+        {
+            background-image: url("/sprites/arcade/tetros/block-3.png");
+        }
+        &.t-4
+
+        {
+            background-image: url("/sprites/arcade/tetros/block-4.png");
+        }
+
+        &.t-5
+        {
+            background-image: url("/sprites/arcade/tetros/block-5.png");
+        }
+
+        &.t-6
+        {
+            background-image: url("/sprites/arcade/tetros/block-6.png");
+        }
+
+        &.t-7
+        {
+            background-image: url("/sprites/arcade/tetros/block-7.png");
+        }
+    }
+
+    &.current
+    {
+        position: absolute;
+        // background: radial-gradient(rgb(255, 255, 255) 0%, #64ffff);
+        // border: solid 1px #64ffff;
+    }
+
+    &.ghost
+    {
+        position: absolute;
+        background: radial-gradient(rgb(255, 255, 255) 0%, #868686 100%);
+        border: solid 1px #868686;
+        opacity: 0.5;
+
+        &.hide
+        {
+            opacity: 0;
+        }
+    }
+
 }
