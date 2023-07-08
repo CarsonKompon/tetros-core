@@ -105,6 +105,7 @@ public partial class TetrosGamePage : Panel
         Level = 1;
         LinesNeeded = 10;
         Playing = true;
+        CurrentPiece = BlockType.Empty;
 
         RequestUpdateBoard();
     }
@@ -347,38 +348,6 @@ public partial class TetrosGamePage : Panel
             HighScore = score;
         }
 
-        // public void ShowAll()
-        // {
-        //     var panelList = new List<Panel>();
-        //     panelList.AddRange(CurrentBlocks);
-        //     panelList.AddRange(GhostBlocks);
-        //     for(int i=0; i<5; i++)
-        //     {
-        //         panelList.AddRange(NextBlocks[i]);
-        //     }
-        //     panelList.AddRange(HoldBlocks);
-        //     foreach(var block in panelList)
-        //     {
-        //         block.RemoveClass("hide");
-        //     }
-        // }
-
-        // public void HideAll()
-        // {
-        //     var panelList = new List<Panel>();
-        //     panelList.AddRange(CurrentBlocks);
-        //     panelList.AddRange(GhostBlocks);
-        //     for(int i=0; i<5; i++)
-        //     {
-        //         panelList.AddRange(NextBlocks[i]);
-        //     }
-        //     panelList.AddRange(HoldBlocks);
-        //     foreach(var block in panelList)
-        //     {
-        //         block.AddClass("hide");
-        //     }
-        // }
-
     #endregion
 
     #region GRAB BAG / QUEUE
@@ -608,6 +577,7 @@ public partial class TetrosGamePage : Panel
 
         public void HardDrop()
         {
+            if(CurrentPiece == BlockType.Empty) return;
             while(!CheckPieceCollision(CurrentPiece, CurrentPieceRotation, new Vector2(CurrentPieceX, CurrentPieceY)))
             {
                 CurrentPieceY += 1;
