@@ -1,0 +1,33 @@
+@using System;
+@using System.Linq;
+@using Sandbox;
+@using Sandbox.UI;
+@inherits Panel
+@attribute [StyleSheet]
+
+@namespace Tetros
+
+<root>
+    <div class="header">Game Over</div>
+
+    <button onclick=@Restart>Play Again</button>
+</root>
+
+@code
+{
+    
+    
+    private void Restart()
+    {
+        if(Ancestors.FirstOrDefault(x => x is TetrosMenu) is TetrosMenu menu)
+        {
+            if(menu.Descendants.FirstOrDefault(x => x is TetrosGamePage) is TetrosGamePage game)
+            {
+                game.StartGame();
+            }
+            menu.Navigate("/");
+        }
+
+        AddClass("hide");
+    }
+}

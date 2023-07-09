@@ -1,0 +1,42 @@
+GameOverPage
+{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: all;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 48px;
+    background: linear-gradient(180deg, #351d1a 0%, #ca7c22 100%);
+
+    .header
+    {
+        font-size: 128px;
+    }
+
+    .button
+    {
+        font-size: 64px;
+        transition: all 0.1s ease-in-out;
+        cursor: pointer;
+        background-color: white;
+        border-radius: 32px;
+        padding: 24px;
+
+        &:hover
+        {
+            transform: scale(1.1);
+        }
+
+        &:active
+        {
+            transform: scale(0.9);
+        }
+    }
+
+    &.hide
+    {
+        display: none;
+    }
+}

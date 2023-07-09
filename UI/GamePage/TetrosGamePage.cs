@@ -18,6 +18,7 @@ public partial class TetrosGamePage : Panel
     // Game Variables
     const int BOARD_WIDTH = 10;
     const int QUEUE_LENGTH = 5;
+    static int BLOCK_SIZE = 10;
     public BlockType HeldPiece {get; set;} = BlockType.Empty;
     public int Level {get; set;} = 1;
     public int LinesNeeded {get; set;} = 10;
@@ -84,6 +85,11 @@ public partial class TetrosGamePage : Panel
                 Menu.EndGame += EndGame;
             }
 
+            if(Parent.HasClass("fullscreen"))
+            {
+                BLOCK_SIZE = 40;
+            }
+
             StartGame();
         }
     }
@@ -107,6 +113,11 @@ public partial class TetrosGamePage : Panel
         LinesNeeded = 10;
         Playing = true;
         CurrentPiece = BlockType.Empty;
+
+        if(Menu?.Descendants.FirstOrDefault(x => x is GameOverPage) is GameOverPage gameOverPage)
+        {
+            gameOverPage.SetClass("hide", true);
+        }
 
         RequestUpdateBoard();
     }
@@ -626,8 +637,8 @@ public partial class TetrosGamePage : Panel
                 int y3 = (int)pos.y + y2;
                 if(shape.Blocks.Contains(i))
                 {
-                    panel[index].Style.Left = x3 * 10f;
-                    panel[index].Style.Top = y3 * 10f;
+                    panel[index].Style.Left = x3 * BLOCK_SIZE;
+                    panel[index].Style.Top = y3 * BLOCK_SIZE;
                     index++;
                 }
             }
