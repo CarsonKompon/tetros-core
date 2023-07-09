@@ -34,6 +34,7 @@ public partial class TetrosGamePage : Panel
     public bool JustHeld {get; set;} = false;
     public int Combo {get; set;} = -1;
     public bool Playing {get; set;} = false;
+    public int TotalLinesCleared {get; set;} = 0;
     private RealTimeSince LastUpdate = 0f;
     private RealTimeSince LeftTimer = 0f;
     private RealTimeSince RightTimer = 0f;
@@ -90,14 +91,14 @@ public partial class TetrosGamePage : Panel
 
     public void StartGame()
     {
-        Log.Info("STARTING TETROS GAME!!!");
+        TotalLinesCleared = 0;
+        LoadHighScore();
 
         Queue.Clear();
         for(int i=0; i<QUEUE_LENGTH; i++)
         {
             var block = GetRandomBlock();
             Queue.Add(block);
-            Log.Info($"Queue[{i}] = {Queue[i]}");
         }
 
         Score = 0;
@@ -113,7 +114,8 @@ public partial class TetrosGamePage : Panel
     public void EndGame(long steamid = 0)
     {
         if(steamid == 0 || steamid == Game.LocalClient.SteamId)
-        {        
+        {
+            Sandbox.Services.Stats.Increment("tetros_lines", TotalLinesCleared); 
             SaveHighScore();
             Menu?.OnExit.Invoke(Score);
         }
@@ -135,15 +137,15 @@ public partial class TetrosGamePage : Panel
 
     public void LoadHighScore()
     {
-        HighScore = Cookie.Get<long>("home.arcade.tetros.hiscore", 0);
-        UpdateHighScore(Score);
+        HighScore = Cookie.Get<long>("tetros.highscore", 0);
     }
 
     public void SaveHighScore()
     {
-        if(Score > Cookie.Get<long>("home.arcade.tetros.hiscore", 0))
+        if(Score > Cookie.Get<long>("tetros.highscore", 0))
         {
-            Cookie.Set("home.arcade.tetros.hiscore", Score);
+            Cookie.Set("tetros.highscore", Score);
+            Sandbox.Services.Stats.SetValue("tetros_highscore", Score); 
         }
     }
 
@@ -334,11 +336,6 @@ public partial class TetrosGamePage : Panel
             Queue = blockTypes.ToList();
         }
 
-        public void UpdateHighScore(long score)
-        {
-            HighScore = score;
-        }
-
     #endregion
 
     #region GRAB BAG / QUEUE
@@ -478,6 +475,7 @@ public partial class TetrosGamePage : Panel
                         }
                     }
                     lines++;
+                    TotalLinesCleared++;
                 }
             }
             if(lines > 0)

@@ -33,7 +33,7 @@ TetrosGamePage
 
     .high-score-panel
     {
-        top: 10px;
+        top: 2px;
         gap: 2px;
         font-size: 8px;
     }
@@ -156,15 +156,15 @@ TetrosGamePage
     }
 }
 
+.hide
+{
+    opacity: 0;
+}
+
 .block
 {
     width: 10px;
     height: 10px;
-    
-    &.hide
-    {
-        opacity: 0;
-    }
 
     &.active, &.current
     {
