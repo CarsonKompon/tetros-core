@@ -14,7 +14,6 @@ TetrosGamePage
         font-family: Poppins;
     }
 
-
     .score-panel
     {
         bottom: 3px;
@@ -36,6 +35,14 @@ TetrosGamePage
         top: 2px;
         gap: 2px;
         font-size: 8px;
+    }
+
+    .board
+    {
+        width: 100px;
+        height: 200px;
+        background-color: rgb(39, 54, 75);
+        flex-wrap: wrap;
     }
 
     .left-panel, .right-panel
