@@ -19,7 +19,6 @@ public partial class TetrosGamePage : Panel
     const int BOARD_WIDTH = 10;
     const int QUEUE_LENGTH = 5;
     static int BLOCK_SIZE = 10;
-    public IClient Player {get; set;} = null;
     public BlockType HeldPiece {get; set;} = BlockType.Empty;
     public int Level {get; set;} = 1;
     public int LinesNeeded {get; set;} = 10;
@@ -96,7 +95,7 @@ public partial class TetrosGamePage : Panel
     }
 
 
-    public void StartGame(long steamid = 0)
+    public void StartGame()
     {
         TotalLinesCleared = 0;
         LoadHighScore();
@@ -112,13 +111,8 @@ public partial class TetrosGamePage : Panel
         Combo = -1;
         Level = 1;
         LinesNeeded = 10;
-        CurrentPiece = BlockType.Empty;
         Playing = true;
-
-        if(steamid != 0)
-        {
-            Player = Game.Clients.FirstOrDefault(x => x.SteamId == steamid);
-        }
+        CurrentPiece = BlockType.Empty;
 
         if(Menu?.Descendants.FirstOrDefault(x => x is GameOverPage) is GameOverPage gameOverPage)
         {
@@ -170,7 +164,6 @@ public partial class TetrosGamePage : Panel
     public void OnFrame()
     {
         if(!Playing) return;
-        if(Player != null && Player != Game.LocalClient) return;
 
         var interval = GetWaitTime();
         if(FastDrop) interval = MathF.Min(0.04f, interval / 4f);
