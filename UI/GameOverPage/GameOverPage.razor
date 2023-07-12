@@ -13,7 +13,7 @@
     <div class="header">Game Over</div>
 
     <div class="leaderboards">
-        @foreach(var leaderboard in Results)
+        @foreach(var leaderboard in Boards)
         {
             <div class="leaderboard">
                 <h3>@leaderboard.Title</h3>
@@ -22,7 +22,7 @@
                     {
                         <div class="entry @IsMe(entry)">
                             <div class="rank">@entry.Rank</div>
-                            <div class="flag">@entry.GetFlagEmoji()</div>
+                            @* <div class="flag">@entry.GetFlagEmoji()</div> *@
                             <div class="name">
                                 <image texture=@AvatarTexture(entry) />
                                 <label>@entry.DisplayName</label>
@@ -40,75 +40,54 @@
 
 @code
 {
-    class LeaderboardResult
-    {
-        public string Title { get; set; }
-        public int TotalEntries { get; set; }
-        public List<LeaderboardEntry> Entries { get; set; }
-    }
-
-    class LeaderboardEntry
-    {
-        public bool Me { get; set; }
-        public long Rank { get; set; }
-        public long Value { get; set; }
-        public long SteamId { get; set; }
-        public string CountryCode { get; set; }
-        public string DisplayName { get; set; }
-
-        public string GetFlagEmoji()
-        {
-            if (string.IsNullOrEmpty(CountryCode))
-                return "";
-
-            string code = CountryCode.Replace("(", "").Replace(")", "");
-
-            var codePoints = code.ToUpper().ToCharArray().Select(c => 127397 + c);
-            return string.Join("", codePoints.Select(c => char.ConvertFromUtf32(c)));
-
-        }
-    }
-    
-    List<LeaderboardResult> Results { get; set; } = new();
     public string[] LeaderboardIds = { "tetros_highscore", "lines_cleared" };
 
+    List<Sandbox.Services.Leaderboards.Board> Boards {get; set;} = new();
     protected override void OnAfterTreeRender( bool firstTime )
     {
         base.OnAfterTreeRender( firstTime );
-        //if(firstTime) UpdateScores();
+
+        if(firstTime)
+        {
+            foreach(var id in LeaderboardIds)
+            {
+                Boards.Add( Sandbox.Services.Leaderboards.Get(id) );
+            }
+            UpdateScores();
+        }
     }
 
 		
 
-    string IsMe(LeaderboardEntry entry)
+    string IsMe(Sandbox.Services.Leaderboards.Entry entry)
     {
         return entry.Me ? "me" : "";
     }
 
-    string AvatarTexture(LeaderboardEntry entry)
+    string AvatarTexture(Sandbox.Services.Leaderboards.Entry entry)
     {
         return $"avatar:{entry.SteamId}";
     }
 
     public async void UpdateScores()
     {
-        Results.Clear();
-        int i = 0;
-        foreach(var id in LeaderboardIds)
+        foreach(var board in Boards)
         {
-            var leaderboard = await GetLeaderboard(id);
-            if(i == 0) leaderboard.Title = "High Scores";
-            else leaderboard.Title = "Lines Cleared";
-            i++;
-            Results.Add(leaderboard);
+            await board.Refresh();
         }
         StateHasChanged();
     }
 
-    private async Task<LeaderboardResult> GetLeaderboard(string leaderboardId)
+    public string GetFlagEmoji(string countrycode)
     {
-        string url = $"https://sap.facepunch.com/package/leaderboard/1/carsonk.tetros/{leaderboardId}/u/{Game.LocalClient.SteamId}/global";
-        return await Http.RequestJsonAsync<LeaderboardResult>(url);
+        if (string.IsNullOrEmpty(countrycode))
+            return "";
+
+        string code = countrycode.Replace("(", "").Replace(")", "");
+
+        var codePoints = code.ToUpper().ToCharArray().Select(c => 127397 + c);
+        return string.Join("", codePoints.Select(c => char.ConvertFromUtf32(c)));
+
     }
 
     private void Restart()
