@@ -1,5 +1,7 @@
 @using System;
+@using System.Collections.Generic;
 @using System.Linq;
+@using System.Threading.Tasks;
 @using Sandbox;
 @using Sandbox.UI;
 @inherits Panel
@@ -10,13 +12,105 @@
 <root>
     <div class="header">Game Over</div>
 
+    <div class="leaderboards">
+        @foreach(var leaderboard in Results)
+        {
+            <div class="leaderboard">
+                <h3>@leaderboard.Title</h3>
+                <div class="entries">
+                    @foreach(var entry in leaderboard.Entries)
+                    {
+                        <div class="entry @IsMe(entry)">
+                            <div class="rank">@entry.Rank</div>
+                            <div class="flag">@entry.GetFlagEmoji()</div>
+                            <div class="name">
+                                <image texture=@AvatarTexture(entry) />
+                                <label>@entry.DisplayName</label>
+                            </div>
+                            <div class="score">@entry.Value</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
     <button onclick=@Restart>Play Again</button>
 </root>
 
 @code
 {
+    class LeaderboardResult
+    {
+        public string Title { get; set; }
+        public int TotalEntries { get; set; }
+        public List<LeaderboardEntry> Entries { get; set; }
+    }
+
+    class LeaderboardEntry
+    {
+        public bool Me { get; set; }
+        public long Rank { get; set; }
+        public long Value { get; set; }
+        public long SteamId { get; set; }
+        public string CountryCode { get; set; }
+        public string DisplayName { get; set; }
+
+        public string GetFlagEmoji()
+        {
+            if (string.IsNullOrEmpty(CountryCode))
+                return "";
+
+            string code = CountryCode.Replace("(", "").Replace(")", "");
+
+            var codePoints = code.ToUpper().ToCharArray().Select(c => 127397 + c);
+            return string.Join("", codePoints.Select(c => char.ConvertFromUtf32(c)));
+
+        }
+    }
     
-    
+    List<LeaderboardResult> Results { get; set; } = new();
+    public string[] LeaderboardIds = { "tetros_highscore", "lines_cleared" };
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        base.OnAfterTreeRender( firstTime );
+        if(firstTime) UpdateScores();
+    }
+
+		
+
+    string IsMe(LeaderboardEntry entry)
+    {
+        return entry.Me ? "me" : "";
+    }
+
+    string AvatarTexture(LeaderboardEntry entry)
+    {
+        return $"avatar:{entry.SteamId}";
+    }
+
+    public async void UpdateScores()
+    {
+        Results.Clear();
+        int i = 0;
+        foreach(var id in LeaderboardIds)
+        {
+            var leaderboard = await GetLeaderboard(id);
+            if(i == 0) leaderboard.Title = "High Scores";
+            else leaderboard.Title = "Lines Cleared";
+            i++;
+            Results.Add(leaderboard);
+        }
+        StateHasChanged();
+    }
+
+    private async Task<LeaderboardResult> GetLeaderboard(string leaderboardId)
+    {
+        string url = $"https://sap.facepunch.com/package/leaderboard/1/carsonk.tetros/{leaderboardId}/u/{Game.LocalClient.SteamId}/global";
+        return await Http.RequestJsonAsync<LeaderboardResult>(url);
+    }
+
     private void Restart()
     {
         if(Ancestors.FirstOrDefault(x => x is TetrosMenu) is TetrosMenu menu)

@@ -148,14 +148,14 @@ public partial class TetrosGamePage : Panel
 
     public void LoadHighScore()
     {
-        HighScore = Cookie.Get<long>("tetros.highscore", 0);
+        HighScore = Cookie.Get<long>("tetros.highscore.standalone", 0);
     }
 
     public void SaveHighScore()
     {
-        if(Score > Cookie.Get<long>("tetros.highscore", 0))
+        if(Score > Cookie.Get<long>("tetros.highscore.standalone", 0))
         {
-            Cookie.Set("tetros.highscore", Score);
+            Cookie.Set("tetros.highscore.standalone", Score);
             Sandbox.Services.Stats.SetValue("tetros_highscore", Score); 
         }
     }
