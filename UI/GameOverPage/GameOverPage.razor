@@ -16,7 +16,7 @@
         @foreach(var leaderboard in Boards)
         {
             <div class="leaderboard">
-                <h3>@leaderboard.Title</h3>
+                <h3>@leaderboard.DisplayName</h3>
                 <div class="entries">
                     @foreach(var entry in leaderboard.Entries)
                     {
