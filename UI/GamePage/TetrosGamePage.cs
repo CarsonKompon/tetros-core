@@ -127,6 +127,7 @@ public partial class TetrosGamePage : Panel
         if(steamid == 0 || steamid == Game.LocalClient.SteamId)
         {
             Sandbox.Services.Stats.Increment("tetros_lines", TotalLinesCleared); 
+            Sandbox.Services.Stats.Increment("tetros_games", 1);
             SaveHighScore();
             Menu?.OnExit.Invoke(Score);
         }
@@ -156,7 +157,7 @@ public partial class TetrosGamePage : Panel
         if(Score > Cookie.Get<long>("tetros.highscore.standalone", 0))
         {
             Cookie.Set("tetros.highscore.standalone", Score);
-            Sandbox.Services.Stats.SetValue("tetros_highscore", Score); 
+            Sandbox.Services.Stats.SetValue("tetros_highscore", Score);
         }
     }
 
