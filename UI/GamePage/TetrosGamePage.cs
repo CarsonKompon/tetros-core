@@ -44,6 +44,8 @@ public partial class TetrosGamePage : Panel
 
     private Entity SoundEntity => null; 
 
+    protected virtual bool IsPlayable => true; 
+
     protected override void OnAfterTreeRender(bool firstTime)
     {
         base.OnAfterTreeRender(firstTime);
@@ -90,13 +92,15 @@ public partial class TetrosGamePage : Panel
                 BLOCK_SIZE = 40;
             }
 
-            StartGame();
+            if(IsPlayable) StartGame();
         }
     }
 
 
     public void StartGame()
     {
+        Log.Info("TETROS: Starting game!");
+
         TotalLinesCleared = 0;
         LoadHighScore();
 
@@ -204,6 +208,7 @@ public partial class TetrosGamePage : Panel
     [GameEvent.Client.BuildInput]
     public void BuildInput()
     {
+        if(!IsPlayable) return;
         if(!Playing) return;
 
         if(Input.Pressed("TetrosHardDrop"))
